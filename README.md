@@ -97,28 +97,7 @@ Set these rules in Firebase Realtime Database:
 cd backend
 python -m uvicorn main:app --reload
 
-
-Backend runs at `http://localhost:8000`
-
 ### 7. Run Frontend
 Open `frontend/chat.html` in your browser or use Live Server
 
-## 📁 Project Structure
-NoteX/
-├── assets/ # Screenshots and images
-│ ├── screenshot.png
-│ └── logo.png
-├── backend/
-│ ├── main.py # FastAPI backend
-│ ├── .env # Environment variables (not in repo)
-│ ├── firebase-credentials.json # Firebase config (not in repo)
-│ ├── requirements.txt # Python dependencies
-│ └── myenv/ # Virtual environment (not in repo)
-├── frontend/
-│ ├── chat.html # Main chat interface
-│ ├── chat.css # Styles
-│ ├── login.html # Login page
-│ └── signup.html # Signup page
-├── .gitignore
-├── .gitattributes
-└── README.md
+
