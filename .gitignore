@@ -1,0 +1,57 @@
+# ========== ENVIRONMENT VARIABLES ==========
+.env
+*.env
+.env.local
+.env.*.local
+
+# ========== FIREBASE CREDENTIALS ==========
+firebase-credentials.json
+*-credentials.json
+serviceAccountKey.json
+
+# ========== PYTHON ==========
+myenv/
+venv/
+env/
+ENV/
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# ========== NODE MODULES ==========
+node_modules/
+package-lock.json
+yarn.lock
+
+# ========== IDE ==========
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# ========== CACHE ==========
+.cache/
+*.cache
+.pytest_cache/
+.coverage
+htmlcov/
+
+# ========== OS ==========
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# ========== MISC ==========
+*.tmp
+*.bak
+*.backup

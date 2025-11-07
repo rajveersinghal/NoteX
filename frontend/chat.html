@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoteX - AI Content Summarizer</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="favicon_io/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon_io/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon_io/favicon-16x16.png">
+    <link rel="manifest" href="favicon_io/site.webmanifest">
+    <link rel="shortcut icon" href="favicon_io/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="chat.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- SIDEBAR -->
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <aside class="sidebar" id="sidebar">
+            <!-- Header -->
+            <div class="sidebar-header">
+                <div class="logo-container">
+                    <div class="logo-icon">N</div>
+                    <span class="logo-text">NoteX</span>
+                </div>
+                <button class="sidebar-toggle-button" id="sidebar-close-btn">✕</button>
+            </div>
+
+            <!-- Nav -->
+            <nav class="sidebar-nav">
+                <!-- New Chat Button -->
+                <button class="sidebar-new-chat-button" id="new-chat-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10"/><line x1="9" y1="14" x2="12" y2="14"/>
+                    </svg>
+                    <span>New Chat</span>
+                </button>
+
+                <!-- Search -->
+                <div class="sidebar-search-chat">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 21l-4.35-4.35M11 18a7 7 0 100-14 7 7 0 000 14z"/>
+                    </svg>
+                    <input type="text" id="search-input" placeholder="Search chats" />
+                </div>
+
+                <!-- Recent Chats -->
+                <div class="recent-chats-list">
+                    <h3 class="recent-chats-title">Recent Chats</h3>
+                    <ul id="chat-list">
+                        <li class="no-chats">No chats yet</li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <button class="theme-toggle" id="theme-btn">🌙</button>
+                <div class="user-profile" id="user-profile">
+                    <div class="user-avatar" id="user-avatar">U</div>
+                    <span class="user-name" id="user-name">User</span>
+                </div>
+                <!-- USER DROPDOWN MENU -->
+                <div class="user-dropdown" id="user-dropdown">
+                    <div class="dropdown-header">
+                        <div style="font-size: 0.8rem; opacity: 0.7;">Logged in as</div>
+                        <div id="dropdown-email" style="font-weight: 600; margin-top: 0.25rem; color: #667eea;">user@email.com</div>
+                    </div>
+                    <button class="dropdown-item" id="profile-btn">
+                        <span>👤</span>
+                        <span>View Profile</span>
+                    </button>
+                    <button class="dropdown-item" id="settings-btn">
+                        <span>⚙️</span>
+                        <span>Settings</span>
+                    </button>
+                    <div class="dropdown-divider"></div>
+                    <button class="dropdown-item logout" id="logout-btn">
+                        <span>🚪</span>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <div class="main-content">
+            <!-- Top Bar -->
+            <div class="top-bar">
+                <button class="hamburger-open" id="hamburger-open-btn">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M4 6H20M4 12H20M4 18H20"/>
+                    </svg>
+                </button>
+                <div class="top-bar-title">NoteX</div>
+                <div style="flex: 1;"></div>
+            </div>
+
+            <!-- Chat Window -->
+            <div class="chat-window">
+                <div class="welcome-screen" id="welcome-screen">
+                    <h1 class="welcome-title">Welcome to NoteX 🚀</h1>
+                    <p class="welcome-subtitle">Your AI-powered document summarizer & conversation partner</p>
+                    
+                    <div class="quick-actions">
+                        <button class="quick-action" id="upload-quick-btn">
+                            <div class="quick-action-icon">📎</div>
+                            <span>Upload PDF</span>
+                        </button>
+                        <button class="quick-action" id="youtube-quick-btn">
+                            <div class="quick-action-icon">🎥</div>
+                            <span>YouTube Video</span>
+                        </button>
+                        <button class="quick-action" id="text-quick-btn">
+                            <div class="quick-action-icon">💬</div>
+                            <span>Ask Anything</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="messages" id="messages"></div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="input-area">
+                <div class="input-container">
+                    <div class="input-actions">
+                        <button class="action-btn" id="flash-btn" title="YouTube">⚡</button>
+                        <button class="action-btn" id="upload-btn" title="Upload PDF">📁</button>
+                    </div>
+                    <textarea id="chat-input" class="chat-input" placeholder="Ask anything..." rows="1"></textarea>
+                    <button class="send-btn" id="send-btn">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Context Menu -->
+    <div class="context-menu" id="context-menu">
+        <button class="context-menu-item" id="share-menu-btn">🔗 Share</button>
+        <button class="context-menu-item" id="delete-menu-btn">🗑️ Delete</button>
+    </div>
+
+    <!-- YouTube Modal -->
+    <div id="youtube-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📹 Summarize YouTube Video</span>
+                <button class="modal-close" id="youtube-close">✕</button>
+            </div>
+            <input type="url" id="youtube-link" class="modal-input" placeholder="https://youtube.com/watch?v=..." autofocus>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="youtube-cancel">Cancel</button>
+                <button class="modal-btn submit" id="youtube-submit">Summarize</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PDF Modal -->
+    <div id="pdf-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>📄 Upload & Summarize PDF</span>
+                <button class="modal-close" id="pdf-close">✕</button>
+            </div>
+            <input type="file" id="file-input" class="modal-input" accept=".pdf,.doc,.docx">
+            <div style="font-size: 0.85rem; color: #999; margin-bottom: 1rem;">Supported: PDF, DOCX (Max 10MB)</div>
+            <div class="modal-buttons">
+                <button class="modal-btn cancel" id="pdf-cancel">Cancel</button>
+                <button class="modal-btn submit" id="pdf-submit">Upload</button>
+            </div>
+        </div>
+    </div>
+    <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyC_UVXYN8xGqxh-IbpBHf93VF_bF_aUfB8",
+        authDomain: "notex-8bdd7.firebaseapp.com",
+        projectId: "notex-8bdd7",
+        storageBucket: "notex-8bdd7.firebasestorage.app",
+        messagingSenderId: "836250884625",
+        appId: "1:836250884625:web:47f94d688aa53bdfcc6fb0",
+        databaseURL: "https://notex-8bdd7-default-rtdb.firebaseio.com"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // STATE
+    let chatHistory = [];
+    let authToken = null;
+    let currentChatId = null;
+    let currentTitle = 'New Chat';
+    let allChats = [];
+    let selectedChatForMenu = null;
+    let searchTerm = '';
+    let isLoading = false;
+    let currentContext = null;
+
+    // DOM
+    const el = {
+        sidebar: document.getElementById('sidebar'),
+        sidebarOverlay: document.getElementById('sidebar-overlay'),
+        hamburgerOpen: document.getElementById('hamburger-open-btn'),
+        sidebarClose: document.getElementById('sidebar-close-btn'),
+        newChatBtn: document.getElementById('new-chat-btn'),
+        searchInput: document.getElementById('search-input'),
+        chatList: document.getElementById('chat-list'),
+        chatInput: document.getElementById('chat-input'),
+        sendBtn: document.getElementById('send-btn'),
+        messages: document.getElementById('messages'),
+        welcomeScreen: document.getElementById('welcome-screen'),
+        contextMenu: document.getElementById('context-menu'),
+        userAvatar: document.getElementById('user-avatar'),
+        userName: document.getElementById('user-name'),
+        themeBtn: document.getElementById('theme-btn'),
+        userProfile: document.getElementById('user-profile'),
+        userDropdown: document.getElementById('user-dropdown'),
+        logoutBtn: document.getElementById('logout-btn'),
+        profileBtn: document.getElementById('profile-btn'),
+        settingsBtn: document.getElementById('settings-btn'),
+        dropdownEmail: document.getElementById('dropdown-email')
+    };
+
+    // AUTH
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            authToken = await user.getIdToken();
+            loadUserProfile(user);
+            await loadChats();
+            console.log('✅ User authenticated:', user.email);
+        } else {
+            window.location.href = 'login.html';
+        }
+    });
+
+    function loadUserProfile(user) {
+        const name = user.displayName || user.email.split('@')[0];
+        const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+        el.userName.textContent = name;
+        el.userAvatar.textContent = initials;
+        el.dropdownEmail.textContent = user.email;
+    }
+
+    // ========== USER DROPDOWN - FIXED TO OPEN UP ==========
+    el.userProfile.addEventListener('click', (e) => {
+        e.stopPropagation();
+        
+        if (el.userDropdown.classList.contains('active')) {
+            el.userDropdown.classList.remove('active');
+        } else {
+            el.userDropdown.classList.add('active');
+            
+            // Position dropdown ABOVE user profile
+            const rect = el.userProfile.getBoundingClientRect();
+            const dropdownHeight = 250;
+            
+            el.userDropdown.style.bottom = (window.innerHeight - rect.top + 10) + 'px';
+            el.userDropdown.style.left = (rect.left - 200 + rect.width) + 'px';
+            el.userDropdown.style.top = 'auto';
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!el.userProfile.contains(e.target) && !el.userDropdown.contains(e.target)) {
+            el.userDropdown.classList.remove('active');
+        }
+    });
+
+    el.logoutBtn.addEventListener('click', async () => {
+        try {
+            await signOut(auth);
+            localStorage.clear();
+            window.location.href = 'login.html';
+        } catch (error) {
+            alert('Logout error: ' + error.message);
+        }
+    });
+
+    el.profileBtn.addEventListener('click', () => {
+        alert('Profile page coming soon!');
+        el.userDropdown.classList.remove('active');
+    });
+
+    el.settingsBtn.addEventListener('click', () => {
+        alert('Settings page coming soon!');
+        el.userDropdown.classList.remove('active');
+    });
+
+    // DARK MODE
+    const isDark = localStorage.getItem('darkMode') === 'true';
+    if (isDark) {
+        document.body.classList.add('dark-mode');
+        el.themeBtn.textContent = '☀️';
+    }
+
+    el.themeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        const dark = document.body.classList.contains('dark-mode');
+        localStorage.setItem('darkMode', dark);
+        el.themeBtn.textContent = dark ? '☀️' : '🌙';
+    });
+
+    // SIDEBAR TOGGLE
+    el.hamburgerOpen.addEventListener('click', () => {
+        el.sidebar.classList.add('show');
+        el.sidebarOverlay.classList.add('show');
+    });
+
+    el.sidebarClose.addEventListener('click', () => {
+        el.sidebar.classList.remove('show');
+        el.sidebarOverlay.classList.remove('show');
+    });
+
+    el.sidebarOverlay.addEventListener('click', () => {
+        el.sidebar.classList.remove('show');
+        el.sidebarOverlay.classList.remove('show');
+    });
+
+    // SEARCH
+    el.searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value.toLowerCase();
+        displayChats();
+    });
+
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.key.toLowerCase() === 'k') {
+            e.preventDefault();
+            el.searchInput.focus();
+        }
+    });
+
+    
+    // ========== NEW CHAT ==========
+// ========== NEW CHAT - ONLY IF NOT BLANK ==========
+el.newChatBtn.addEventListener('click', async () => {
+    // ⭐ PREVENT CREATING BLANK CHAT IF CURRENT IS ALSO BLANK
+    if (currentTitle === 'New Chat' && chatHistory.length === 0) {
+        alert('⚠️ Please send a message first before creating a new chat!');
+        console.log('⏸️ Blocked blank chat creation');
+        return;
+    }
+    
+    const newChatId = generateId();
+    
+    console.log('🆕 Creating new chat:', newChatId);
+    
+    el.messages.innerHTML = '';
+    el.welcomeScreen.style.display = 'block';
+    chatHistory = [];
+    currentChatId = newChatId;
+    currentTitle = 'New Chat';
+    currentContext = null;
+    el.chatInput.value = '';
+    
+    try {
+        const payload = {
+            chatId: newChatId,
+            title: 'New Chat',
+            messages: [],
+            context: null
+        };
+
+        console.log('📤 Saving new chat:', payload);
+
+        const res = await fetch('http://localhost:8000/api/chats/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        console.log('Response:', res.status);
+
+        if (res.ok) {
+            const result = await res.json();
+            console.log('✅ New chat saved:', result);
+            
+            setTimeout(() => {
+                console.log('🔄 Reloading sidebar...');
+                loadChats();
+            }, 500);
+        }
+    } catch (err) {
+        console.error('❌ Error creating chat:', err);
+    }
+    
+    el.sidebar.classList.remove('show');
+    el.sidebarOverlay.classList.remove('show');
+});
+
+
+
+   // ========== SEND MESSAGE - WITH DYNAMIC TITLE ==========
+async function sendMessage() {
+    const msg = el.chatInput.value.trim();
+    if (!msg || authToken === null || isLoading) return;
+
+    el.welcomeScreen.style.display = 'none';
+    el.chatInput.value = '';
+    el.chatInput.style.height = 'auto';
+
+    const userDiv = document.createElement('div');
+    userDiv.className = 'message user';
+    userDiv.innerHTML = `
+        <div class="message-content">${msg}</div>
+        <div class="message-avatar">👤</div>
+    `;
+    el.messages.appendChild(userDiv);
+    chatHistory.push({ role: 'user', content: msg });
+    el.messages.parentElement.scrollTop = el.messages.parentElement.scrollHeight;
+
+    // ⭐ UPDATE TITLE WITH FIRST 50 CHARS OF MESSAGE
+    if (currentTitle === 'New Chat') {
+        currentTitle = msg.substring(0, 50) + (msg.length > 50 ? '...' : '');
+        console.log('📝 Updated title to:', currentTitle);
+    }
+
+    addLoading();
+    isLoading = true;
+    el.sendBtn.disabled = true;
+
+    try {
+        const res = await fetch('http://localhost:8000/api/chat', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ 
+                message: msg, 
+                history: chatHistory, 
+                context: currentContext,
+                model: 'Google Gemini'
+            })
+        });
+
+        removeLoading();
+        
+        if (res.ok) {
+            const data = await res.json();
+            if (data.success && data.message) {
+                const assistantDiv = document.createElement('div');
+                assistantDiv.className = 'message assistant';
+                assistantDiv.innerHTML = `
+                    <div class="message-avatar">🤖</div>
+                    <div class="message-content">${data.message}</div>
+                `;
+                el.messages.appendChild(assistantDiv);
+                chatHistory.push({ role: 'assistant', content: data.message });
+                el.messages.parentElement.scrollTop = el.messages.parentElement.scrollHeight;
+
+                await autoSaveChat();
+            }
+        }
+    } catch (err) {
+        removeLoading();
+        console.error(err);
+    } finally {
+        isLoading = false;
+        el.sendBtn.disabled = false;
+    }
+}
+
+
+    function addLoading() {
+        const div = document.createElement('div');
+        div.className = 'message assistant';
+        div.id = 'loading-msg';
+        div.innerHTML = `
+            <div class="message-avatar">🤖</div>
+            <div class="message-content">
+                <div class="loading-dots">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+        `;
+        el.messages.appendChild(div);
+        el.messages.parentElement.scrollTop = el.messages.parentElement.scrollHeight;
+    }
+
+    function removeLoading() {
+        document.getElementById('loading-msg')?.remove();
+    }
+
+    el.sendBtn.addEventListener('click', sendMessage);
+    el.chatInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    el.chatInput.addEventListener('input', () => {
+        el.chatInput.style.height = 'auto';
+        el.chatInput.style.height = Math.min(el.chatInput.scrollHeight, 120) + 'px';
+    });
+
+    // ========== DATABASE ==========
+function generateId() {
+    return 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+async function loadChats() {
+    if (!authToken) {
+        console.log('⏳ Waiting for auth token...');
+        return;
+    }
+    
+    try {
+        console.log('📡 Loading chats from backend...');
+        const res = await fetch('http://localhost:8000/api/chats', {
+            method: 'GET',
+            headers: { 
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        console.log('📊 Response status:', res.status);
+        
+        if (res.ok) {
+            const data = await res.json();
+            console.log('✅ Data received:', data);
+            
+            if (data.success && Array.isArray(data.chats)) {
+                allChats = data.chats;
+                console.log('✨ Total chats:', allChats.length);
+                allChats.forEach(chat => {
+                    console.log('   📌 Chat:', chat.id, '-', chat.title);
+                });
+                displayChats();
+            } else {
+                console.warn('⚠️ No success flag or chats array');
+                allChats = [];
+                displayChats();
+            }
+        } else {
+            const error = await res.text();
+            console.error('❌ Backend error:', res.status, error);
+            allChats = [];
+            displayChats();
+        }
+    } catch (err) {
+        console.error('💥 Network error:', err);
+        allChats = [];
+        displayChats();
+    }
+}
+
+function displayChats() {
+    console.log('🎨 Displaying', allChats.length, 'chats, searching:', searchTerm);
+    
+    const filtered = allChats.filter(chat => 
+        chat.title.toLowerCase().includes(searchTerm)
+    );
+
+    console.log('🔍 Filtered:', filtered.length, 'chats');
+
+    if (filtered.length === 0) {
+        el.chatList.innerHTML = '<li class="no-chats">' + (searchTerm ? 'No chats found' : 'No chats yet') + '</li>';
+        return;
+    }
+
+    el.chatList.innerHTML = '';
+    
+    filtered.forEach((chat, idx) => {
+        console.log(`  [${idx + 1}] Adding:`, chat.title);
+        
+        const li = document.createElement('li');
+        li.className = 'chat-item';
+        
+        const isActive = currentChatId === chat.id;
+        li.innerHTML = `
+            <a href="#" class="nav-link ${isActive ? 'active' : ''}" data-chat-id="${chat.id}">
+                <span class="nav-text">${chat.title}</span>
+            </a>
+            <button class="delete-chat-btn" data-chat-id="${chat.id}">🗑️</button>
+        `;
+
+        li.querySelector('.nav-link').addEventListener('click', (e) => {
+            e.preventDefault();
+            console.log('🔗 Loading chat:', chat.id);
+            loadChat(chat.id);
+        });
+
+        li.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            selectedChatForMenu = chat.id;
+            el.contextMenu.style.left = e.clientX + 'px';
+            el.contextMenu.style.top = e.clientY + 'px';
+            el.contextMenu.classList.add('show');
+        });
+
+        li.querySelector('.delete-chat-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (confirm('Delete this chat?')) {
+                deleteChat(chat.id);
+            }
+        });
+
+        el.chatList.appendChild(li);
+    });
+    
+    console.log('✅ Display complete');
+}
+
+async function loadChat(id) {
+    try {
+        const chat = allChats.find(c => c.id === id);
+        if (!chat) {
+            console.error('❌ Chat not found:', id);
+            return;
+        }
+
+        console.log('📂 Loading chat messages:', chat.title);
+        
+        currentChatId = id;
+        currentTitle = chat.title;
+        chatHistory = chat.messages || [];
+        currentContext = chat.context;
+
+        el.messages.innerHTML = '';
+        el.welcomeScreen.style.display = 'none';
+
+        chatHistory.forEach(msg => {
+            const div = document.createElement('div');
+            div.className = `message ${msg.role}`;
+            div.innerHTML = `
+                <div class="message-avatar">${msg.role === 'user' ? '👤' : '🤖'}</div>
+                <div class="message-content">${msg.content}</div>
+            `;
+            el.messages.appendChild(div);
+        });
+
+        console.log('✅ Loaded', chatHistory.length, 'messages');
+        el.messages.parentElement.scrollTop = el.messages.parentElement.scrollHeight;
+        
+        displayChats();
+        el.sidebar.classList.remove('show');
+        el.sidebarOverlay.classList.remove('show');
+    } catch (err) {
+        console.error('Error loading chat:', err);
+    }
+}
+
+async function autoSaveChat() {
+    if (!currentChatId || chatHistory.length === 0) {
+        console.log('⏭️ Skip save: no chatId or empty history');
+        return;
+    }
+
+    if (!authToken) {
+        console.error('❌ No auth token');
+        return;
+    }
+
+    console.log('💾 Auto-saving chat:', currentChatId);
+    console.log('   Title:', currentTitle);
+    console.log('   Messages:', chatHistory.length);
+
+    try {
+        const payload = {
+            chatId: currentChatId,
+            title: currentTitle,
+            messages: chatHistory,
+            context: currentContext
+        };
+        
+        console.log('📤 Sending to backend:', payload);
+
+        const res = await fetch('http://localhost:8000/api/chats/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify(payload)
+        });
+
+        console.log('📥 Response:', res.status);
+
+        if (res.ok) {
+            const result = await res.json();
+            console.log('✅ Save successful:', result);
+            
+            // Reload chats to reflect changes
+            setTimeout(() => {
+                console.log('🔄 Reloading chats...');
+                loadChats();
+            }, 500);
+        } else {
+            const error = await res.text();
+            console.error('❌ Save failed:', res.status, error);
+        }
+    } catch (err) {
+        console.error('💥 Save error:', err);
+    }
+}
+
+async function deleteChat(id) {
+    console.log('🗑️ Deleting chat:', id);
+    
+    try {
+        const res = await fetch(`http://localhost:8000/api/chats/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+
+        if (res.ok) {
+            console.log('✅ Deleted');
+            if (currentChatId === id) {
+                el.newChatBtn.click();
+            }
+            await loadChats();
+        }
+    } catch (err) {
+        console.error('Delete error:', err);
+    }
+}
+
+    // ========== CONTEXT MENU ==========
+    document.getElementById('share-menu-btn').addEventListener('click', async () => {
+        if (!selectedChatForMenu) return;
+
+        const token = generateId();
+        const url = `${window.location.origin}/shared/${token}`;
+        
+        try {
+            await fetch(`http://localhost:8000/api/chats/${selectedChatForMenu}/share`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({ chatId: selectedChatForMenu, shareToken: token })
+            });
+
+            alert('Share link:\n' + url);
+        } catch (err) {
+            console.error(err);
+        }
+
+        el.contextMenu.classList.remove('show');
+    });
+
+    document.getElementById('delete-menu-btn').addEventListener('click', () => {
+        if (confirm('Delete this chat permanently?')) {
+            deleteChat(selectedChatForMenu);
+        }
+        el.contextMenu.classList.remove('show');
+    });
+
+    document.addEventListener('click', () => {
+        el.contextMenu.classList.remove('show');
+    });
+
+    // ========== YOUTUBE ==========
+
+[document.getElementById('youtube-quick-btn'), document.getElementById('flash-btn')].forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', () => {
+            document.getElementById('youtube-modal').classList.add('active');
+            document.getElementById('youtube-link').focus();
+        });
+    }
+});
+
+document.getElementById('youtube-close')?.addEventListener('click', () => {
+    document.getElementById('youtube-modal').classList.remove('active');
+});
+
+document.getElementById('youtube-cancel')?.addEventListener('click', () => {
+    document.getElementById('youtube-modal').classList.remove('active');
+});
+
+document.getElementById('youtube-submit')?.addEventListener('click', async () => {
+    const url = document.getElementById('youtube-link').value.trim();
+    if (!url) {
+        alert('Enter YouTube URL');
+        return;
+    }
+
+    console.log('🎥 YouTube URL:', url);
+
+    addLoading();
+    document.getElementById('youtube-modal').classList.remove('active');
+
+    try {
+        console.log('📤 Sending to backend...');
+        
+        const res = await fetch('http://localhost:8000/api/summarize/youtube', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`
+            },
+            body: JSON.stringify({ 
+                url: url, 
+                model: 'Google Gemini' 
+            })
+        });
+
+        console.log('📥 Response status:', res.status);
+        
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('❌ Backend error:', res.status, errorText);
+            removeLoading();
+            alert('❌ Backend Error: ' + res.status + '\n' + errorText);
+            return;
+        }
+
+        const data = await res.json();
+        console.log('✅ Response:', data);
+        
+        removeLoading();
+        
+        if (data.success && data.summary) {
+            el.welcomeScreen.style.display = 'none';
+            currentContext = data.summary;
+            
+            // ⭐ DYNAMIC TITLE FOR YOUTUBE
+            if (currentTitle === 'New Chat') {
+                const videoId = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)?.[1] || 'Video';
+                currentTitle = '🎥 YouTube: ' + videoId;
+                console.log('📝 Updated title to:', currentTitle);
+            }
+            
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">🎥 <strong>YouTube Summary:</strong><br/><br/>${data.summary.substring(0, 500)}...</div>
+            `;
+            el.messages.appendChild(div);
+            chatHistory.push({ role: 'assistant', content: '🎥 YouTube Summary:\n\n' + data.summary });
+            el.messages.parentElement.scrollTop = el.messages.parentElement.scrollHeight;
+            document.getElementById('youtube-link').value = '';
+
+            await autoSaveChat();
+        } else {
+            removeLoading();
+            alert('❌ Error: ' + JSON.stringify(data));
+        }
+    } catch (err) {
+        removeLoading();
+        console.error('💥 YouTube error:', err);
+        alert('❌ ' + err.message);
+    }
+});
+
+    // ========== PDF ==========
+   
+[document.getElementById('upload-quick-btn'), document.getElementById('upload-btn')].forEach(btn => {
+    if (btn) {
+        btn.addEventListener('click', () => {
+            document.getElementById('pdf-modal').classList.add('active');
+        });
+    }
+});
+
+document.getElementById('pdf-close')?.addEventListener('click', () => {
+    document.getElementById('pdf-modal').classList.remove('active');
+});
+
+document.getElementById('pdf-cancel')?.addEventListener('click', () => {
+    document.getElementById('pdf-modal').classList.remove('active');
+});
+
+document.getElementById('pdf-submit')?.addEventListener('click', async () => {
+    const file = document.getElementById('file-input').files[0];
+    if (!file) {
+        alert('Select a file');
+        return;
+    }
+
+    console.log('📄 File:', file.name);
+
+    addLoading();
+    document.getElementById('pdf-modal').classList.remove('active');
+
+    try {
+        const form = new FormData();
+        form.append('file', file);
+
+        console.log('📤 Uploading file...');
+
+        const res = await fetch('http://localhost:8000/api/summarize/document', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${authToken}` },
+            body: form
+        });
+
+        console.log('📥 Response status:', res.status);
+
+        if (!res.ok) {
+            const errorText = await res.text();
+            console.error('❌ Backend error:', res.status, errorText);
+            removeLoading();
+            alert('❌ Backend Error: ' + res.status + '\n' + errorText);
+            return;
+        }
+
+        const data = await res.json();
+        console.log('✅ Response:', data);
+
+        removeLoading();
+
+        if (data.success && data.summary) {
+            el.welcomeScreen.style.display = 'none';
+            currentContext = data.summary;
+            
+            // ⭐ DYNAMIC TITLE FOR PDF
+            if (currentTitle === 'New Chat') {
+                currentTitle = '📄 ' + file.name.substring(0, 30);
+                console.log('📝 Updated title to:', currentTitle);
+            }
+            
+            const div = document.createElement('div');
+            div.className = 'message assistant';
+            div.innerHTML = `
+                <div class="message-avatar">🤖</div>
+                <div class="message-content">📄 <strong>Document Summary:</strong><br/><br/>${data.summary.substring(0, 500)}...</div>
+            `;
+            el.messages.appendChild(div);
+            chatHistory.push({ role: 'assistant', content: '📄 Document Summary:\n\n' + data.summary });
+            el.messages.parentElement.scrollTop = el.messages.parentElement.scrollHeight;
+            document.getElementById('file-input').value = '';
+
+            await autoSaveChat();
+        } else {
+            removeLoading();
+            alert('❌ Error: ' + JSON.stringify(data));
+        }
+    } catch (err) {
+        removeLoading();
+        console.error('💥 PDF error:', err);
+        alert('❌ ' + err.message);
+    }
+});
+
+
+    console.log('✅ NoteX Ready');
+</script>
+
+</body>
+</html>
