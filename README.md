@@ -2,7 +2,7 @@
 
 > A modern web application that summarizes YouTube videos, PDFs, and provides intelligent chat capabilities using Google Gemini AI.
 
-![NoteX Screenshot](https://via.placeholder.com/800x400?text=NoteX+Screenshot)
+![NoteX Banner](./assets/screenshot.png)
 
 ## ✨ Features
 
@@ -13,6 +13,17 @@
 - 🌙 **Dark Mode** - Toggle between light and dark themes
 - 🔐 **User Authentication** - Secure login with Firebase Auth
 - 📱 **Responsive Design** - Works on desktop and mobile
+
+## 📸 Screenshots
+
+### Chat Interface
+![Chat Interface](./assets/chat-screenshot.png)
+
+### YouTube Summarization
+![YouTube Summary](./assets/youtube-screenshot.png)
+
+### Dark Mode
+![Dark Mode](./assets/dark-mode-screenshot.png)
 
 ## 🛠️ Tech Stack
 
@@ -36,4 +47,78 @@
 - Google AI API Key
 
 ### 1. Clone Repository
+git clone https://github.com/rajveersinghal/NoteX.git
 
+### 2. Backend Setup
+cd backend
+python -m
+
+Activate virtual environment
+Windows:
+myenv\Scripts\activate
+
+Linux/Mac:
+source myenv/bin/activate
+
+Install dependencies
+pip install -r requirements.txt
+
+### 3. Environment Variables
+Create `.env` file in `backend/` folder:
+GOOGLE_API_KEY=your_google_api_key_here
+GROQ_API_KEY=your_groq_api_key_here
+COHERE_API_KEY=your_cohere_api_key_here
+
+
+### 4. Firebase Setup
+
+1. Go to [Firebase Console](https://console.firebase.google.com)
+2. Create a new project
+3. Enable **Authentication** → Email/Password
+4. Enable **Realtime Database**
+5. Download `firebase-credentials.json` from Project Settings → Service Accounts
+6. Place in `backend/` folder
+
+### 5. Firebase Database Rules
+
+Set these rules in Firebase Realtime Database:
+{
+"rules": {
+"chats": {
+"$uid": {
+".read": "auth.uid === $uid",
+".write": "auth.uid === $uid"
+}
+}
+}
+}
+
+### 6. Run Backend
+cd backend
+python -m uvicorn main:app --reload
+
+
+Backend runs at `http://localhost:8000`
+
+### 7. Run Frontend
+Open `frontend/chat.html` in your browser or use Live Server
+
+## 📁 Project Structure
+NoteX/
+├── assets/ # Screenshots and images
+│ ├── screenshot.png
+│ └── logo.png
+├── backend/
+│ ├── main.py # FastAPI backend
+│ ├── .env # Environment variables (not in repo)
+│ ├── firebase-credentials.json # Firebase config (not in repo)
+│ ├── requirements.txt # Python dependencies
+│ └── myenv/ # Virtual environment (not in repo)
+├── frontend/
+│ ├── chat.html # Main chat interface
+│ ├── chat.css # Styles
+│ ├── login.html # Login page
+│ └── signup.html # Signup page
+├── .gitignore
+├── .gitattributes
+└── README.md
